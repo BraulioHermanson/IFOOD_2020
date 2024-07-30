@@ -17,7 +17,7 @@ def inspect_outliers(dataframe, column, whisker_width=1.5):
         (dataframe[column] < lower_bound) | (dataframe[column] > upper_bound)
     ]
 
-def pairplot(dataframe, columns, hue_column=None,alpha=0.5, corner=True):
+def pairplot(dataframe, columns, hue_column=None,alpha=0.5, corner=True,palette="tab10"):
     analysis = columns.copy() + [hue_column]
 
     sns.pairplot(
@@ -25,7 +25,8 @@ def pairplot(dataframe, columns, hue_column=None,alpha=0.5, corner=True):
         diag_kind="kde",
         hue=hue_column,
         plot_kws=dict(alpha=alpha),
-        corner=corner
+        corner=corner,
+        palette=palette
         );
 
 def graficos_elbow_silhouette(X,random_state=42, intervalo_k=(2,11)):
