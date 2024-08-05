@@ -99,3 +99,153 @@ def visualizar_clusters(
     ax.set_title("Clusters")
     
     plt.show()
+
+
+def plot_columns_percent_by_cluster(
+    dataframe,
+    columns,
+    rows_cols=(2, 3),
+    figsize=(15, 8),
+    column_cluster="cluster",
+):
+    """Função para gerar gráficos de barras com a porcentagem de cada valor por cluster.
+
+    Parameters
+    ----------
+    dataframe : pandas.DataFrame
+        Dataframe com os dados.
+    columns : List[str]
+        Lista com o nome das colunas (strings) a serem utilizadas.
+    rows_cols : tuple, opcional
+        Tupla com o número de linhas e colunas do grid de eixos, por padrão (2, 3)
+    figsize : tuple, opcional
+        Tupla com a largura e a altura da figura, por padrão (15, 8)
+    column_cluster : str, opcional
+        Nome da coluna com os números dos clusters, por padrão "cluster"
+    """
+
+    fig, axs = plt.subplots(
+        nrows=rows_cols[0], ncols=rows_cols[1], figsize=figsize, sharey=True
+    )
+
+    if not isinstance(axs, np.ndarray):
+        axs = np.array(axs)
+
+    for ax, col in zip(axs.flatten(), columns):
+        h = sns.histplot(
+            x=column_cluster,
+            hue=col,
+            data=dataframe,
+            ax=ax,
+            multiple="fill",
+            stat="percent",
+            discrete=True,
+            shrink=0.8,
+        )
+
+        n_clusters = dataframe[column_cluster].nunique()
+        h.set_xticks(range(n_clusters))
+        h.yaxis.set_major_formatter(PercentFormatter(1))
+        h.set_ylabel("")
+        h.tick_params(axis="both", which="both", length=0)
+
+        for bars in h.containers:
+            h.bar_label(
+                bars,
+                label_type="center",
+                labels=[f"{b.get_height():.1%}" for b in bars],
+                color="white",
+                weight="bold",
+                fontsize=11,
+            )
+
+        for bar in h.patches:
+            bar.set_linewidth(0)
+
+    plt.subplots_adjust(hspace=0.3, wspace=0.3)
+
+    plt.show()
+
+
+def plot_columns_percent_hue_cluster(
+    dataframe,
+    columns,
+    rows_cols=(2, 3),
+    figsize=(15, 8),
+    column_cluster="cluster",
+    palette="tab10",
+):
+    """Função para gerar gráficos de barras com a porcentagem de cada valor com cluster
+    como hue.
+
+    Parameters
+    ----------
+    dataframe : pandas.DataFrame
+        Dataframe com os dados.
+    columns : List[str]
+        Lista com o nome das colunas (strings) a serem utilizadas.
+    rows_cols : tuple, opcional
+        Tupla com o número de linhas e colunas do grid de eixos, por padrão (2, 3)
+    figsize : tuple, opcional
+        Tupla com a largura e a altura da figura, por padrão (15, 8)
+    column_cluster : str, opcional
+        Nome da coluna com os números dos clusters, por padrão "cluster"
+    palette : str, opcional
+        Paleta a ser utilizada, por padrão "tab10"
+    """
+    fig, axs = plt.subplots(
+        nrows=rows_cols[0], ncols=rows_cols[1], figsize=figsize, sharey=True
+    )
+
+    if not isinstance(axs, np.ndarray):
+        axs = np.array(axs)
+
+    for ax, col in zip(axs.flatten(), columns):
+        h = sns.histplot(
+            x=col,
+            hue=column_cluster,
+            data=dataframe,
+            ax=ax,
+            multiple="fill",
+            stat="percent",
+            discrete=True,
+            shrink=0.8,
+            palette=palette,
+        )
+
+        if dataframe[col].dtype != "object":
+            h.set_xticks(range(dataframe[col].nunique()))
+
+        h.yaxis.set_major_formatter(PercentFormatter(1))
+        h.set_ylabel("")
+        h.tick_params(axis="both", which="both", length=0)
+
+        for bars in h.containers:
+            h.bar_label(
+                bars,
+                label_type="center",
+                labels=[f"{b.get_height():.1%}" for b in bars],
+                color="white",
+                weight="bold",
+                fontsize=11,
+            )
+
+        for bar in h.patches:
+            bar.set_linewidth(0)
+
+        legend = h.get_legend()
+        legend.remove()
+
+    labels = [text.get_text() for text in legend.get_texts()]
+
+    fig.legend(
+        handles=legend.legend_handles,
+        labels=labels,
+        loc="upper center",
+        ncols=dataframe[column_cluster].nunique(),
+        title="Clusters",
+    )
+
+    plt.subplots_adjust(hspace=0.3, wspace=0.3)
+
+    plt.show()
