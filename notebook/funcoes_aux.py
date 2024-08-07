@@ -1,9 +1,12 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-
+import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+from matplotlib.ticker import PercentFormatter
+import os
+
 
 def inspect_outliers(dataframe, column, whisker_width=1.5):
     q1 = dataframe[column].quantile(0.25)
